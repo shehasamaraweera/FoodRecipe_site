@@ -28,17 +28,25 @@ const addRecipe = async (req, res) => {
 };
 
 const updateRecipe = async (req, res) => {
-  const { title, ingredients, instructions, time } = req.body || {};
-  let recipe =  await Recipe.findById(req.params.id);
-  try{  if(!recipe) {
-    await Recipe.findByIdAndUpdate(req.params.id, req.body,{new:true});
-    res.json({title, ingredients, instructions, time });
-  }
- }
- catch (err) {
-    return res.status(404).json({ message: "Recipe not found" });
- }
+  try {
+    const { title, ingredients, instructions, time } = req.body || {};
 
+    const recipe = await Recipe.findById(req.params.id);
+
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    const updatedRecipe = await Recipe.findByIdAndUpdate(
+      req.params.id,
+      { title, ingredients, instructions, time },
+      { new: true },
+    );
+
+    res.json(updatedRecipe);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
 };
 
 const deleteRecipe = (req, res) => {
