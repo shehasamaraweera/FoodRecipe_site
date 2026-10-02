@@ -1,11 +1,13 @@
 const Recipe = require("../models/recipe");
 
-const getRecipes = (req, res) => {
-  res.json({ message: "Hello World" });
-}
+const getRecipes = async(req, res) => {
+  const recipes = await Recipe.find();
+  return res.json(recipes);
+};
 
-const getRecipe = (req, res) => {
-  res.json({ message: "Hello World" });
+const getRecipe = async (req, res) => {
+  const recipe = await Recipe.findById(req.params.id);
+  return res.json(recipe);
 };
 
 const addRecipe = async (req, res) => {
@@ -25,8 +27,18 @@ const addRecipe = async (req, res) => {
   return res.json(newRecipe);
 };
 
-const updateRecipe = (req, res) => {
-  res.json({ message: "Hello World" });
+const updateRecipe = async (req, res) => {
+  const { title, ingredients, instructions, time } = req.body || {};
+  let recipe =  await Recipe.findById(req.params.id);
+  try{  if(!recipe) {
+    await Recipe.findByIdAndUpdate(req.params.id, req.body,{new:true});
+    res.json({title, ingredients, instructions, time });
+  }
+ }
+ catch (err) {
+    return res.status(404).json({ message: "Recipe not found" });
+ }
+
 };
 
 const deleteRecipe = (req, res) => {
